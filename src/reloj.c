@@ -101,8 +101,8 @@ void ClockTic(clock_t reloj) {
         reloj->hora_actual[DEC_HORA]++;
     }
     if ((reloj->hora_actual[DEC_HORA] == 2) && (reloj->hora_actual[UNI_HORA] == 4)) { // Paso de dia
-        reloj->hora_actual[1] = 0;
-        reloj->hora_actual[0] = 0;
+        reloj->hora_actual[UNI_HORA] = 0;
+        reloj->hora_actual[DEC_HORA] = 0;
     }
 }
 

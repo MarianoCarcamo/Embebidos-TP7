@@ -43,11 +43,13 @@ extern "C" {
 
 typedef struct clock_s * clock_t;
 
+typedef bool (*funcion_disparo)(void);
+
 /* === Public variable declarations ============================================================ */
 
 /* === Public function declarations ============================================================ */
 
-clock_t ClockCreate(int tics_por_segundo);
+clock_t ClockCreate(int tics_por_segundo, funcion_disparo funcion);
 
 void ClockTic(clock_t reloj);
 

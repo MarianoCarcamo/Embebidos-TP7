@@ -39,6 +39,7 @@ SPDX-License-Identifier: MIT
 
 struct alarm_s {
     bool habilitada;
+    funcion_disparo funcion;
     uint8_t hora_seteada[6];
 };
 
@@ -54,18 +55,33 @@ struct clock_s {
 
 /* === Private function declarations =========================================================== */
 
+bool CoincideHoraConAlarma(clock_t reloj);
+
+void VerificarAlarma(clock_t reloj);
+
 /* === Public variable definitions ============================================================= */
 
 /* === Private variable definitions ============================================================ */
 
 /* === Private function implementation ========================================================= */
 
+bool CoincideHoraConAlarma(clock_t reloj) {
+    return memcmp(reloj->alarma->hora_seteada, reloj->hora_actual, sizeof(reloj->hora_actual));
+}
+
+void VerificarAlarma(clock_t reloj) {
+    if (reloj->alarma->habilitada && CoincideHoraConAlarma(reloj)) {
+        reloj->alarma->funcion();
+    }
+}
+
 /* === Public function implementation ========================================================== */
 
-clock_t ClockCreate(int tics_por_segundo) {
+clock_t ClockCreate(int tics_por_segundo, funcion_disparo funcion) {
     static struct clock_s self[1];
     memset(self, 0, sizeof(self));
     self->tics_per_sec = tics_por_segundo;
+    self->alarma->funcion = funcion;
     return self;
 }
 
@@ -82,9 +98,10 @@ bool ClockSetTime(clock_t reloj, const uint8_t * hora, int size) {
 
 void ClockTic(clock_t reloj) {
     reloj->tics++;
-    if (reloj->tics == 5) { // Incremento en la unidad de segundos
+    if (reloj->tics == 5) { // Incremento en la unidad de segundos y verifico alarma
         reloj->hora_actual[UNI_SEC]++;
         reloj->tics = 0;
+        VerificarAlarma(reloj); // Verifico si debe sonar la alarma
     }
     if (reloj->hora_actual[UNI_SEC] == 10) { // Incremento en la decena de segundos
         reloj->hora_actual[UNI_SEC] = 0;

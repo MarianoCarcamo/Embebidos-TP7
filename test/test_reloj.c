@@ -1,5 +1,4 @@
 /* TESTS PENDIENTES
-Fijar la alarma y avanzar la hora para que suene.
 Fijar la alarma, deshabilitarla y avanzar el reloj para que no suene.
 Hacer sonar la alarma y posponerla.
 Hacer sonar la alarma y cancelarla hasta el otro dia.
@@ -52,6 +51,8 @@ SPDX-License-Identifier: MIT
 
 /* === Private function declarations =========================================================== */
 
+bool ClockAlarmTriggered(void);
+
 /* === Public variable definitions ============================================================= */
 
 /* === Private variable definitions ============================================================ */
@@ -59,11 +60,17 @@ SPDX-License-Identifier: MIT
 static clock_t reloj;
 static uint8_t hora[6];
 static const uint8_t TIME_SET[] = {1, 2, 3, 4, 0, 0};
+static bool alarma_testigo = false;
 /* === Private function implementation ========================================================= */
+
+bool ClockAlarmTriggered(void) {
+    alarma_testigo = true;
+    return alarma_testigo;
+}
 
 /* === Public function implementation ========================================================== */
 void setUp(void) {
-    reloj = ClockCreate(TICS_POR_SEGUNDO);
+    reloj = ClockCreate(TICS_POR_SEGUNDO, ClockAlarmTriggered);
     ClockSetTime(reloj, TIME_SET, 4);
 }
 
@@ -72,14 +79,14 @@ void test_reloj_arranca_con_hora_invalida(void) {
     static const uint8_t ESPERADO[] = {0, 0, 0, 0, 0, 0};
     memset(hora, 0xff, sizeof(hora)); // Se inicializa hora en 0xff para asegurar el pase a 0
 
-    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
+    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO, ClockAlarmTriggered);
     TEST_ASSERT_FALSE(ClockGetTime(reloj, hora, 6));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
 }
 
 // Al ajustar la hora el reloj queda en hora y es valido.
 void test_ajustar_hora(void) {
-    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
+    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO, ClockAlarmTriggered);
     TEST_ASSERT_TRUE(ClockSetTime(reloj, TIME_SET, 4));
     TEST_ASSERT_TRUE(ClockGetTime(reloj, hora, 6));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(TIME_SET, hora, 6);
@@ -147,6 +154,16 @@ void test_ajustar_alarma(void) {
     TEST_ASSERT_TRUE(ClockSetAlarm(reloj, ESPERADO, 4));
     TEST_ASSERT_TRUE(ClockGetAlarm(reloj, hora, 6));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
+}
+
+// Fijar la alarma y avanzar la hora para que suene.
+void test_disparar_alarma(void) {
+    static const uint8_t SET_ALARMA[] = {1, 3, 3, 4, 0, 0};
+
+    ClockSetAlarm(reloj, SET_ALARMA, 4);
+    TEST_ASSERT_FALSE(alarma_testigo);
+    SIMULAR_SEGUNDOS(1 * 60 * 60);
+    TEST_ASSERT_TRUE(alarma_testigo);
 }
 /* === End of documentation ==================================================================== */
 

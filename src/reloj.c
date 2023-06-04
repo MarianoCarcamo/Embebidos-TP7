@@ -34,6 +34,8 @@ SPDX-License-Identifier: MIT
 
 struct clock_s {
     uint8_t hora_actual[6];
+    uint32_t tics_per_sec;
+    uint32_t tics;
     bool valida;
 };
 
@@ -52,6 +54,7 @@ struct clock_s {
 clock_t ClockCreate(int tics_por_segundo) {
     static struct clock_s self[1];
     memset(self, 0, sizeof(self));
+    self->tics_per_sec = tics_por_segundo;
     return self;
 }
 
@@ -67,7 +70,36 @@ bool ClockSetTime(clock_t reloj, const uint8_t * hora, int size) {
 }
 
 void ClockTic(clock_t reloj) {
-    return reloj->hora_actual[5] = 1;
+    reloj->tics++;
+    if (reloj->tics == 5) {
+        reloj->hora_actual[5]++;
+        reloj->tics = 0;
+    }
+    if (reloj->hora_actual[5] == 10) {
+        reloj->hora_actual[5] = 0;
+        reloj->hora_actual[4]++;
+    }
+    if (reloj->hora_actual[4] == 6) {
+        reloj->hora_actual[4] = 0;
+        reloj->hora_actual[3]++;
+    }
+    if (reloj->hora_actual[3] == 10) {
+        reloj->hora_actual[3] = 0;
+        reloj->hora_actual[2]++;
+    }
+    if (reloj->hora_actual[2] == 6) {
+        reloj->hora_actual[2] = 0;
+        reloj->hora_actual[1]++;
+    }
+    if (reloj->hora_actual[1] == 10) {
+        reloj->hora_actual[1] = 0;
+        reloj->hora_actual[0]++;
+    }
+    if ((reloj->hora_actual[0] == 2) & (reloj->hora_actual[1] == 4)) {
+        reloj->hora_actual[1] = 0;
+        reloj->hora_actual[0] = 0;
+    }
+    // reloj->hora_actual[5] = 1;
 }
 
 /* === End of documentation ==================================================================== */

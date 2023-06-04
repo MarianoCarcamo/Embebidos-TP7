@@ -98,6 +98,69 @@ void test_avanza_unidad_segundos(void) {
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
 }
 
+// Despues de n ciclos de reloj la hora avanza 10 segundos.
+void test_avanza_decena_segundos(void) {
+    static const uint8_t HORA[] = {1, 2, 3, 4, 0, 0};
+    static const uint8_t ESPERADO[] = {1, 2, 3, 4, 1, 0};
+    uint8_t hora[6];
+
+    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
+    ClockSetTime(reloj, HORA, 4);
+    SIMULAR_SEGUNDOS(10, ClockTic(reloj));
+    ClockGetTime(reloj, hora, 6);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
+}
+
+// Despues de n ciclos de reloj la hora avanza 1 minuto.
+void test_avanza_unidad_minutos(void) {
+    static const uint8_t HORA[] = {1, 2, 3, 4, 0, 0};
+    static const uint8_t ESPERADO[] = {1, 2, 3, 5, 0, 0};
+    uint8_t hora[6];
+
+    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
+    ClockSetTime(reloj, HORA, 4);
+    SIMULAR_SEGUNDOS(1 * 60, ClockTic(reloj));
+    ClockGetTime(reloj, hora, 6);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
+}
+
+// Despues de n ciclos de reloj la hora avanza 1 hora.
+void test_avanza_unidad_hora(void) {
+    static const uint8_t HORA[] = {1, 2, 3, 4, 0, 0};
+    static const uint8_t ESPERADO[] = {1, 3, 3, 4, 0, 0};
+    uint8_t hora[6];
+
+    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
+    ClockSetTime(reloj, HORA, 4);
+    SIMULAR_SEGUNDOS(1 * 60 * 60, ClockTic(reloj));
+    ClockGetTime(reloj, hora, 6);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
+}
+
+// Despues de n ciclos de reloj la hora avanza 10 horas.
+void test_avanza_decena_hora(void) {
+    static const uint8_t HORA[] = {1, 2, 3, 4, 0, 0};
+    static const uint8_t ESPERADO[] = {2, 2, 3, 4, 0, 0};
+    uint8_t hora[6];
+
+    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
+    ClockSetTime(reloj, HORA, 4);
+    SIMULAR_SEGUNDOS(10 * 60 * 60, ClockTic(reloj));
+    ClockGetTime(reloj, hora, 6);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
+}
+
+void test_avanza_un_dia(void) {
+    static const uint8_t HORA[] = {1, 2, 3, 4, 0, 0};
+    static const uint8_t ESPERADO[] = {1, 2, 3, 4, 0, 0};
+    uint8_t hora[6];
+
+    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
+    ClockSetTime(reloj, HORA, 4);
+    SIMULAR_SEGUNDOS(24 * 60 * 60, ClockTic(reloj));
+    ClockGetTime(reloj, hora, 6);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
+}
 /* === End of documentation ==================================================================== */
 
 /** @} End of module definition for doxygen */

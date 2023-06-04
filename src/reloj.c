@@ -29,7 +29,12 @@ SPDX-License-Identifier: MIT
 #include <string.h>
 
 /* === Macros definitions ====================================================================== */
-
+#define DEC_HORA 0
+#define UNI_HORA 1
+#define DEC_MIN  2
+#define UNI_MIN  3
+#define DEC_SEC  4
+#define UNI_SEC  5
 /* === Private data type declarations ========================================================== */
 
 struct clock_s {
@@ -71,35 +76,34 @@ bool ClockSetTime(clock_t reloj, const uint8_t * hora, int size) {
 
 void ClockTic(clock_t reloj) {
     reloj->tics++;
-    if (reloj->tics == 5) {
-        reloj->hora_actual[5]++;
+    if (reloj->tics == 5) { // Incremento en la unidad de segundos
+        reloj->hora_actual[UNI_SEC]++;
         reloj->tics = 0;
     }
-    if (reloj->hora_actual[5] == 10) {
-        reloj->hora_actual[5] = 0;
-        reloj->hora_actual[4]++;
+    if (reloj->hora_actual[UNI_SEC] == 10) { // Incremento en la decena de segundos
+        reloj->hora_actual[UNI_SEC] = 0;
+        reloj->hora_actual[DEC_SEC]++;
     }
-    if (reloj->hora_actual[4] == 6) {
-        reloj->hora_actual[4] = 0;
-        reloj->hora_actual[3]++;
+    if (reloj->hora_actual[DEC_SEC] == 6) { // Incremento en la unidad de minutos
+        reloj->hora_actual[DEC_SEC] = 0;
+        reloj->hora_actual[UNI_MIN]++;
     }
-    if (reloj->hora_actual[3] == 10) {
-        reloj->hora_actual[3] = 0;
-        reloj->hora_actual[2]++;
+    if (reloj->hora_actual[UNI_MIN] == 10) { // Incremento en la decena de minutos
+        reloj->hora_actual[UNI_MIN] = 0;
+        reloj->hora_actual[DEC_MIN]++;
     }
-    if (reloj->hora_actual[2] == 6) {
-        reloj->hora_actual[2] = 0;
-        reloj->hora_actual[1]++;
+    if (reloj->hora_actual[DEC_MIN] == 6) { // Incremento en la unidad de horas
+        reloj->hora_actual[DEC_MIN] = 0;
+        reloj->hora_actual[UNI_HORA]++;
     }
-    if (reloj->hora_actual[1] == 10) {
-        reloj->hora_actual[1] = 0;
-        reloj->hora_actual[0]++;
+    if (reloj->hora_actual[UNI_HORA] == 10) { // Incremento en la decena de horas
+        reloj->hora_actual[UNI_HORA] = 0;
+        reloj->hora_actual[DEC_HORA]++;
     }
-    if ((reloj->hora_actual[0] == 2) & (reloj->hora_actual[1] == 4)) {
+    if ((reloj->hora_actual[DEC_HORA] == 2) && (reloj->hora_actual[UNI_HORA] == 4)) { // Paso de dia
         reloj->hora_actual[1] = 0;
         reloj->hora_actual[0] = 0;
     }
-    // reloj->hora_actual[5] = 1;
 }
 
 /* === End of documentation ==================================================================== */

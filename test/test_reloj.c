@@ -1,5 +1,4 @@
 /* TESTS PENDIENTES
-Despues de n ciclos de reloj la hora avanza un segundo, 10 segundos, un minuto...
 Fijar la hora de la alarma y consultarla.
 Fijar la alarma y avanzar la hora para que suene.
 Fijar la alarma, deshabilitarla y avanzar el reloj para que no suene.
@@ -34,6 +33,7 @@ SPDX-License-Identifier: MIT
 
 /* === Headers files inclusions =============================================================== */
 
+#include <string.h>
 #include "unity.h"
 #include "reloj.h"
 
@@ -41,10 +41,10 @@ SPDX-License-Identifier: MIT
 
 #define TICS_POR_SEGUNDO 5
 
-#define SIMULAR_SEGUNDOS(VALOR, FUNCION)                                                           \
+#define SIMULAR_SEGUNDOS(VALOR)                                                                    \
     for (int count = 0; count < VALOR; count++) {                                                  \
         for (int indice = 0; indice < TICS_POR_SEGUNDO; indice++) {                                \
-            FUNCION;                                                                               \
+            ClockTic(reloj);                                                                       \
         }                                                                                          \
     }
 /* === Private data type declarations ========================================================== */
@@ -57,16 +57,21 @@ SPDX-License-Identifier: MIT
 
 /* === Private variable definitions ============================================================ */
 
+static clock_t reloj;
+static uint8_t hora[6];
+static const uint8_t TIME_SET[] = {1, 2, 3, 4, 0, 0};
 /* === Private function implementation ========================================================= */
 
 /* === Public function implementation ========================================================== */
 void setUp(void) {
+    reloj = ClockCreate(TICS_POR_SEGUNDO);
+    ClockSetTime(reloj, TIME_SET, 4);
 }
 
 // Al inicializar el reloj esta en 00:00 y con hora invalida.
 void test_reloj_arranca_con_hora_invalida(void) {
     static const uint8_t ESPERADO[] = {0, 0, 0, 0, 0, 0};
-    uint8_t hora[6] = {0xff};
+    memset(hora, 0xff, sizeof(hora)); // Se inicializa hora en 0xff para asegurar el pase a 0
 
     clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
     TEST_ASSERT_FALSE(ClockGetTime(reloj, hora, 6));
@@ -75,89 +80,61 @@ void test_reloj_arranca_con_hora_invalida(void) {
 
 // Al ajustar la hora el reloj queda en hora y es valido.
 void test_ajustar_hora(void) {
-
-    static const uint8_t ESPERADO[] = {1, 2, 3, 4, 0, 0};
-    uint8_t hora[6];
-
     clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
-    TEST_ASSERT_TRUE(ClockSetTime(reloj, ESPERADO, 4));
+    TEST_ASSERT_TRUE(ClockSetTime(reloj, TIME_SET, 4));
     TEST_ASSERT_TRUE(ClockGetTime(reloj, hora, 6));
-    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(TIME_SET, hora, 6);
 }
 
 // Despues de n ciclos de reloj la hora avanza un segundo.
 void test_avanza_unidad_segundos(void) {
-    static const uint8_t HORA[] = {1, 2, 3, 4, 0, 0};
     static const uint8_t ESPERADO[] = {1, 2, 3, 4, 0, 1};
-    uint8_t hora[6];
 
-    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
-    ClockSetTime(reloj, HORA, 4);
-    SIMULAR_SEGUNDOS(1, ClockTic(reloj));
+    SIMULAR_SEGUNDOS(1);
     ClockGetTime(reloj, hora, 6);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
 }
 
 // Despues de n ciclos de reloj la hora avanza 10 segundos.
 void test_avanza_decena_segundos(void) {
-    static const uint8_t HORA[] = {1, 2, 3, 4, 0, 0};
     static const uint8_t ESPERADO[] = {1, 2, 3, 4, 1, 0};
-    uint8_t hora[6];
 
-    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
-    ClockSetTime(reloj, HORA, 4);
-    SIMULAR_SEGUNDOS(10, ClockTic(reloj));
+    SIMULAR_SEGUNDOS(10);
     ClockGetTime(reloj, hora, 6);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
 }
 
 // Despues de n ciclos de reloj la hora avanza 1 minuto.
 void test_avanza_unidad_minutos(void) {
-    static const uint8_t HORA[] = {1, 2, 3, 4, 0, 0};
     static const uint8_t ESPERADO[] = {1, 2, 3, 5, 0, 0};
-    uint8_t hora[6];
 
-    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
-    ClockSetTime(reloj, HORA, 4);
-    SIMULAR_SEGUNDOS(1 * 60, ClockTic(reloj));
+    SIMULAR_SEGUNDOS(1 * 60);
     ClockGetTime(reloj, hora, 6);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
 }
 
 // Despues de n ciclos de reloj la hora avanza 1 hora.
 void test_avanza_unidad_hora(void) {
-    static const uint8_t HORA[] = {1, 2, 3, 4, 0, 0};
     static const uint8_t ESPERADO[] = {1, 3, 3, 4, 0, 0};
-    uint8_t hora[6];
 
-    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
-    ClockSetTime(reloj, HORA, 4);
-    SIMULAR_SEGUNDOS(1 * 60 * 60, ClockTic(reloj));
+    SIMULAR_SEGUNDOS(1 * 60 * 60);
     ClockGetTime(reloj, hora, 6);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
 }
 
 // Despues de n ciclos de reloj la hora avanza 10 horas.
 void test_avanza_decena_hora(void) {
-    static const uint8_t HORA[] = {1, 2, 3, 4, 0, 0};
     static const uint8_t ESPERADO[] = {2, 2, 3, 4, 0, 0};
-    uint8_t hora[6];
 
-    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
-    ClockSetTime(reloj, HORA, 4);
-    SIMULAR_SEGUNDOS(10 * 60 * 60, ClockTic(reloj));
+    SIMULAR_SEGUNDOS(10 * 60 * 60);
     ClockGetTime(reloj, hora, 6);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
 }
 
 void test_avanza_un_dia(void) {
-    static const uint8_t HORA[] = {1, 2, 3, 4, 0, 0};
     static const uint8_t ESPERADO[] = {1, 2, 3, 4, 0, 0};
-    uint8_t hora[6];
 
-    clock_t reloj = ClockCreate(TICS_POR_SEGUNDO);
-    ClockSetTime(reloj, HORA, 4);
-    SIMULAR_SEGUNDOS(24 * 60 * 60, ClockTic(reloj));
+    SIMULAR_SEGUNDOS(24 * 60 * 60);
     ClockGetTime(reloj, hora, 6);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
 }

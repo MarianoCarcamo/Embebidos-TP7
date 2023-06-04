@@ -37,10 +37,16 @@ SPDX-License-Identifier: MIT
 #define UNI_SEC  5
 /* === Private data type declarations ========================================================== */
 
+struct alarm_s {
+    bool habilitada;
+    uint8_t hora_seteada[6];
+};
+
 struct clock_s {
     uint8_t hora_actual[6];
     uint32_t tics_per_sec;
     uint32_t tics;
+    struct alarm_s alarma[1];
     bool valida;
 };
 
@@ -71,7 +77,7 @@ bool ClockGetTime(clock_t reloj, uint8_t * hora, int size) {
 bool ClockSetTime(clock_t reloj, const uint8_t * hora, int size) {
     memcpy(reloj->hora_actual, hora, size);
     reloj->valida = true;
-    return true;
+    return reloj->valida;
 }
 
 void ClockTic(clock_t reloj) {
@@ -104,6 +110,17 @@ void ClockTic(clock_t reloj) {
         reloj->hora_actual[UNI_HORA] = 0;
         reloj->hora_actual[DEC_HORA] = 0;
     }
+}
+
+bool ClockGetAlarm(clock_t reloj, uint8_t * hora, int size) {
+    memcpy(hora, reloj->alarma->hora_seteada, size);
+    return reloj->alarma->habilitada;
+}
+
+bool ClockSetAlarm(clock_t reloj, const uint8_t * hora, int size) {
+    memcpy(reloj->alarma->hora_seteada, hora, size);
+    reloj->alarma->habilitada = true;
+    return reloj->alarma->habilitada;
 }
 
 /* === End of documentation ==================================================================== */

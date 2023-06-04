@@ -1,5 +1,4 @@
 /* TESTS PENDIENTES
-Fijar la hora de la alarma y consultarla.
 Fijar la alarma y avanzar la hora para que suene.
 Fijar la alarma, deshabilitarla y avanzar el reloj para que no suene.
 Hacer sonar la alarma y posponerla.
@@ -131,11 +130,22 @@ void test_avanza_decena_hora(void) {
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
 }
 
+// Despues de n ciclos de reloj la hora avanza 1 dia.
 void test_avanza_un_dia(void) {
     static const uint8_t ESPERADO[] = {1, 2, 3, 4, 0, 0};
 
     SIMULAR_SEGUNDOS(24 * 60 * 60);
     ClockGetTime(reloj, hora, 6);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
+}
+
+// Fijar la hora de la alarma y consultarla.
+void test_ajustar_alarma(void) {
+    static const uint8_t ESPERADO[] = {1, 3, 3, 4, 0, 0};
+
+    TEST_ASSERT_FALSE(ClockGetAlarm(reloj, hora, 6));
+    TEST_ASSERT_TRUE(ClockSetAlarm(reloj, ESPERADO, 4));
+    TEST_ASSERT_TRUE(ClockGetAlarm(reloj, hora, 6));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
 }
 /* === End of documentation ==================================================================== */

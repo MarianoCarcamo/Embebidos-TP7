@@ -55,6 +55,10 @@ bool ClockGetTime(clock_t reloj, uint8_t * hora, int size);
 
 bool ClockSetTime(clock_t reloj, const uint8_t * hora, int size);
 
+bool ClockGetAlarm(clock_t reloj, uint8_t * hora, int size);
+
+bool ClockSetAlarm(clock_t reloj, const uint8_t * hora, int size);
+
 /* === End of documentation ==================================================================== */
 
 #ifdef __cplusplus

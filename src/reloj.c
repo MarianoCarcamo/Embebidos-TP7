@@ -1,5 +1,3 @@
-
-
 /************************************************************************************************
 Copyright (c) 2023, Mariano Carcamo marianocarcamo98@gmail.com
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -66,6 +64,10 @@ bool ClockSetTime(clock_t reloj, const uint8_t * hora, int size) {
     memcpy(reloj->hora_actual, hora, size);
     reloj->valida = true;
     return true;
+}
+
+void ClockTic(clock_t reloj) {
+    return reloj->hora_actual[5] = 1;
 }
 
 /* === End of documentation ==================================================================== */

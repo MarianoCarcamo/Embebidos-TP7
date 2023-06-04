@@ -59,6 +59,8 @@ bool CoincideHoraConAlarma(clock_t reloj);
 
 void VerificarAlarma(clock_t reloj);
 
+void DispararAlarma(clock_t reloj);
+
 /* === Public variable definitions ============================================================= */
 
 /* === Private variable definitions ============================================================ */
@@ -71,8 +73,12 @@ bool CoincideHoraConAlarma(clock_t reloj) {
 
 void VerificarAlarma(clock_t reloj) {
     if (reloj->alarma->habilitada && CoincideHoraConAlarma(reloj)) {
-        reloj->alarma->funcion();
+        DispararAlarma(reloj);
     }
+}
+
+void DispararAlarma(clock_t reloj) {
+    reloj->alarma->funcion();
 }
 
 /* === Public function implementation ========================================================== */

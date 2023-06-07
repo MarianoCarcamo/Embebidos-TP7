@@ -1,5 +1,4 @@
 /* TESTS PENDIENTES
-Hacer sonar la alarma y posponerla.
 Hacer sonar la alarma y cancelarla hasta el otro dia.
 */
 
@@ -50,7 +49,7 @@ SPDX-License-Identifier: MIT
 
 /* === Private function declarations =========================================================== */
 
-bool ClockAlarmTriggered(clock_t reloj);
+void ClockAlarmTriggered(clock_t reloj);
 
 /* === Public variable definitions ============================================================= */
 
@@ -62,9 +61,8 @@ static const uint8_t TIME_SET[] = {1, 2, 3, 4, 0, 0};
 static bool alarma_testigo;
 /* === Private function implementation ========================================================= */
 
-bool ClockAlarmTriggered(clock_t reloj) {
+void ClockAlarmTriggered(clock_t reloj) {
     alarma_testigo = true;
-    return alarma_testigo;
 }
 
 /* === Public function implementation ========================================================== */
@@ -176,6 +174,17 @@ void test_no_disparar_alarma(void) {
     TEST_ASSERT_FALSE(alarma_testigo);
 }
 
+// Hacer sonar la alarma y posponerla.
+void test_posponer_alarma(void) {
+    static const uint8_t SET_ALARMA[] = {1, 3, 3, 4, 0, 0};
+
+    ClockSetAlarm(reloj, SET_ALARMA, 4);
+    SIMULAR_SEGUNDOS(1 * 60 * 60);
+    AlarmSnooze(reloj, 5);
+    TEST_ASSERT_FALSE(alarma_testigo);
+    SIMULAR_SEGUNDOS(1 * 60 * 60);
+    TEST_ASSERT_TRUE(alarma_testigo);
+}
 /* === End of documentation ==================================================================== */
 
 /** @} End of module definition for doxygen */

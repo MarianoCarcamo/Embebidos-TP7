@@ -104,7 +104,7 @@ bool ClockSetTime(clock_t reloj, const uint8_t * hora, int size) {
 
 void ClockTic(clock_t reloj) {
     reloj->tics++;
-    if (reloj->tics == 5) { // Incremento en la unidad de segundos y verifico alarma
+    if (reloj->tics == reloj->tics_per_sec) { // Incremento en la unidad de segundos
         reloj->hora_actual[UNI_SEC]++;
         reloj->tics = 0;
         VerificarAlarma(reloj); // Verifico si debe sonar la alarma
@@ -153,6 +153,9 @@ bool AlarmToggel(clock_t reloj) {
         reloj->alarma->habilitada = true;
     }
     return reloj->alarma->habilitada;
+}
+
+void AlarmSnooze(clock_t reloj, int min) {
 }
 
 /* === End of documentation ==================================================================== */

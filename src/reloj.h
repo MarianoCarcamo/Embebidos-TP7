@@ -43,7 +43,7 @@ extern "C" {
 
 typedef struct clock_s * clock_t;
 
-typedef bool (*funcion_disparo)(void);
+typedef bool (*funcion_disparo)(clock_t reloj);
 
 /* === Public variable declarations ============================================================ */
 
@@ -60,6 +60,8 @@ bool ClockSetTime(clock_t reloj, const uint8_t * hora, int size);
 bool ClockGetAlarm(clock_t reloj, uint8_t * hora, int size);
 
 bool ClockSetAlarm(clock_t reloj, const uint8_t * hora, int size);
+
+bool AlarmToggel(clock_t reloj);
 
 /* === End of documentation ==================================================================== */
 

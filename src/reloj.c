@@ -78,7 +78,7 @@ void VerificarAlarma(clock_t reloj) {
 }
 
 void DispararAlarma(clock_t reloj) {
-    reloj->alarma->funcion();
+    reloj->alarma->funcion(reloj);
 }
 
 /* === Public function implementation ========================================================== */
@@ -143,6 +143,15 @@ bool ClockGetAlarm(clock_t reloj, uint8_t * hora, int size) {
 bool ClockSetAlarm(clock_t reloj, const uint8_t * hora, int size) {
     memcpy(reloj->alarma->hora_seteada, hora, size);
     reloj->alarma->habilitada = true;
+    return reloj->alarma->habilitada;
+}
+
+bool AlarmToggel(clock_t reloj) {
+    if (reloj->alarma->habilitada) {
+        reloj->alarma->habilitada = false;
+    } else {
+        reloj->alarma->habilitada = true;
+    }
     return reloj->alarma->habilitada;
 }
 

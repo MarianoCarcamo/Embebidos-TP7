@@ -85,19 +85,16 @@ void VerificarAlarma(clock_t reloj) {
             indice = reloj->tics_per_sec;
         }
         indice--;
-        printf("%i\n", indice);
     }
 }
 
 void DispararAlarma(clock_t reloj) {
-    printf("disparada\n");
     reloj->alarma->funcion(reloj);
 }
 
 void SnoozeCountDown(clock_t reloj) {
     if (reloj->alarma->snooze_count) {
         reloj->alarma->snooze_count--;
-        printf("%i\n", reloj->alarma->snooze_count);
         if (reloj->alarma->snooze_count == 0) {
             DispararAlarma(reloj);
         }

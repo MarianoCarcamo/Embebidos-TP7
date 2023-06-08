@@ -1,5 +1,5 @@
 /* TESTS PENDIENTES
-Hacer sonar la alarma y cancelarla hasta el otro dia.
+
 */
 
 /************************************************************************************************
@@ -188,6 +188,18 @@ void test_posponer_alarma(void) {
     SIMULAR_SEGUNDOS(4 * 60);
     TEST_ASSERT_FALSE(alarma_testigo);
     SIMULAR_SEGUNDOS(1 * 60);
+    TEST_ASSERT_TRUE(alarma_testigo);
+}
+
+// Hacer sonar la alarma y cancelarla hasta el otro dia.
+void test_alarma_paso_dia(void) {
+    static const uint8_t SET_ALARMA[] = {1, 3, 3, 4, 0, 0};
+
+    ClockSetAlarm(reloj, SET_ALARMA, 4);
+    SIMULAR_SEGUNDOS(1 * 60 * 60);
+    TEST_ASSERT_TRUE(alarma_testigo);
+    alarma_testigo = false;
+    SIMULAR_SEGUNDOS(24 * 60 * 60);
     TEST_ASSERT_TRUE(alarma_testigo);
 }
 /* === End of documentation ==================================================================== */

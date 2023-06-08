@@ -97,6 +97,7 @@ void DispararAlarma(clock_t reloj) {
 void SnoozeCountDown(clock_t reloj) {
     if (reloj->alarma->snooze_count) {
         reloj->alarma->snooze_count--;
+        printf("%i\n", reloj->alarma->snooze_count);
         if (reloj->alarma->snooze_count == 0) {
             DispararAlarma(reloj);
         }
@@ -128,6 +129,7 @@ void ClockTic(clock_t reloj) {
     if (reloj->tics == reloj->tics_per_sec) { // Incremento en la unidad de segundos
         reloj->hora_actual[UNI_SEC]++;
         reloj->tics = 0;
+        SnoozeCountDown(reloj);
     }
     if (reloj->hora_actual[UNI_SEC] == 10) { // Incremento en la decena de segundos
         reloj->hora_actual[UNI_SEC] = 0;
@@ -154,7 +156,6 @@ void ClockTic(clock_t reloj) {
         reloj->hora_actual[DEC_HORA] = 0;
     }
     VerificarAlarma(reloj); // Verifico si debe sonar la alarma
-    SnoozeCountDown(reloj);
 }
 
 bool ClockGetAlarm(clock_t reloj, uint8_t * hora, int size) {

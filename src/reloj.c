@@ -41,6 +41,7 @@ struct alarm_s {
     bool habilitada;
     funcion_disparo funcion;
     uint8_t hora_seteada[6];
+    uint16_t snooze_count;
 };
 
 struct clock_s {
@@ -61,6 +62,8 @@ void VerificarAlarma(clock_t reloj);
 
 void DispararAlarma(clock_t reloj);
 
+void SnoozeCountDown(clock_t reloj);
+
 /* === Public variable definitions ============================================================= */
 
 /* === Private variable definitions ============================================================ */
@@ -68,7 +71,10 @@ void DispararAlarma(clock_t reloj);
 /* === Private function implementation ========================================================= */
 
 bool CoincideHoraConAlarma(clock_t reloj) {
-    return memcmp(reloj->alarma->hora_seteada, reloj->hora_actual, sizeof(reloj->hora_actual));
+    if (memcmp(reloj->alarma->hora_seteada, reloj->hora_actual, sizeof(reloj->hora_actual)) == 0) {
+        return true;
+    }
+    return false;
 }
 
 void VerificarAlarma(clock_t reloj) {
@@ -78,9 +84,23 @@ void VerificarAlarma(clock_t reloj) {
 }
 
 void DispararAlarma(clock_t reloj) {
-    reloj->alarma->funcion(reloj);
+    static uint32_t indice;
+    if (!indice) {
+        reloj->alarma->funcion(reloj);
+        printf("disparada\n");
+        indice = reloj->tics_per_sec;
+    }
+    indice--;
 }
 
+void SnoozeCountDown(clock_t reloj) {
+    if (reloj->alarma->snooze_count) {
+        reloj->alarma->snooze_count--;
+        if (reloj->alarma->snooze_count == 0) {
+            // DispararAlarma(reloj);
+        }
+    }
+}
 /* === Public function implementation ========================================================== */
 
 clock_t ClockCreate(int tics_por_segundo, funcion_disparo funcion) {
@@ -107,7 +127,6 @@ void ClockTic(clock_t reloj) {
     if (reloj->tics == reloj->tics_per_sec) { // Incremento en la unidad de segundos
         reloj->hora_actual[UNI_SEC]++;
         reloj->tics = 0;
-        VerificarAlarma(reloj); // Verifico si debe sonar la alarma
     }
     if (reloj->hora_actual[UNI_SEC] == 10) { // Incremento en la decena de segundos
         reloj->hora_actual[UNI_SEC] = 0;
@@ -133,6 +152,8 @@ void ClockTic(clock_t reloj) {
         reloj->hora_actual[UNI_HORA] = 0;
         reloj->hora_actual[DEC_HORA] = 0;
     }
+    VerificarAlarma(reloj); // Verifico si debe sonar la alarma
+    SnoozeCountDown(reloj);
 }
 
 bool ClockGetAlarm(clock_t reloj, uint8_t * hora, int size) {
@@ -156,6 +177,7 @@ bool AlarmToggel(clock_t reloj) {
 }
 
 void AlarmSnooze(clock_t reloj, int min) {
+    reloj->alarma->snooze_count = min * 60;
 }
 
 /* === End of documentation ==================================================================== */

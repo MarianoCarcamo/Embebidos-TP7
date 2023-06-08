@@ -160,7 +160,9 @@ void test_disparar_alarma(void) {
 
     ClockSetAlarm(reloj, SET_ALARMA, 4);
     TEST_ASSERT_FALSE(alarma_testigo);
-    SIMULAR_SEGUNDOS(1 * 60 * 60);
+    SIMULAR_SEGUNDOS(30 * 60);
+    TEST_ASSERT_FALSE(alarma_testigo);
+    SIMULAR_SEGUNDOS(30 * 60);
     TEST_ASSERT_TRUE(alarma_testigo);
 }
 
@@ -179,10 +181,11 @@ void test_posponer_alarma(void) {
     static const uint8_t SET_ALARMA[] = {1, 3, 3, 4, 0, 0};
 
     ClockSetAlarm(reloj, SET_ALARMA, 4);
-    SIMULAR_SEGUNDOS(1 * 60 * 60);
+    SIMULAR_SEGUNDOS(1 * 60 * 60 + 1);
+    TEST_ASSERT_TRUE(alarma_testigo);
     AlarmSnooze(reloj, 5);
-    TEST_ASSERT_FALSE(alarma_testigo);
-    SIMULAR_SEGUNDOS(1 * 60 * 60);
+    alarma_testigo = false;
+    SIMULAR_SEGUNDOS(10 * 60);
     TEST_ASSERT_TRUE(alarma_testigo);
 }
 /* === End of documentation ==================================================================== */

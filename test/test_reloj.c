@@ -162,7 +162,7 @@ void test_disparar_alarma(void) {
     TEST_ASSERT_FALSE(alarma_testigo);
     SIMULAR_SEGUNDOS(30 * 60);
     TEST_ASSERT_FALSE(alarma_testigo);
-    SIMULAR_SEGUNDOS(30 * 60);
+    SIMULAR_SEGUNDOS(30 * 60 + 1);
     TEST_ASSERT_TRUE(alarma_testigo);
 }
 
@@ -185,7 +185,7 @@ void test_posponer_alarma(void) {
     TEST_ASSERT_TRUE(alarma_testigo);
     AlarmSnooze(reloj, 5);
     alarma_testigo = false;
-    SIMULAR_SEGUNDOS(10 * 60);
+    SIMULAR_SEGUNDOS(5 * 60);
     TEST_ASSERT_TRUE(alarma_testigo);
 }
 /* === End of documentation ==================================================================== */

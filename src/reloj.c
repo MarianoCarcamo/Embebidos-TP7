@@ -78,26 +78,27 @@ bool CoincideHoraConAlarma(clock_t reloj) {
 }
 
 void VerificarAlarma(clock_t reloj) {
+    static uint32_t indice;
     if (reloj->alarma->habilitada && CoincideHoraConAlarma(reloj)) {
-        DispararAlarma(reloj);
+        if (!indice) {
+            DispararAlarma(reloj);
+            indice = reloj->tics_per_sec;
+        }
+        indice--;
+        printf("%i\n", indice);
     }
 }
 
 void DispararAlarma(clock_t reloj) {
-    static uint32_t indice;
-    if (!indice) {
-        reloj->alarma->funcion(reloj);
-        printf("disparada\n");
-        indice = reloj->tics_per_sec;
-    }
-    indice--;
+    printf("disparada\n");
+    reloj->alarma->funcion(reloj);
 }
 
 void SnoozeCountDown(clock_t reloj) {
     if (reloj->alarma->snooze_count) {
         reloj->alarma->snooze_count--;
         if (reloj->alarma->snooze_count == 0) {
-            // DispararAlarma(reloj);
+            DispararAlarma(reloj);
         }
     }
 }
